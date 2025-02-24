@@ -1,0 +1,16 @@
+{
+  "name": "talky",
+  "version": "1.0.0",
+  "description": "Chatting and calling system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.0.1"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
+}
