@@ -1,28 +1,34 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
+const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
+const authRoutes = require("./authRoutes");
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Serve the static files
-app.use(express.static('public'));
+app.use(express.json());
+app.use(express.static("public"));
+app.use(authRoutes);
 
-// Handle incoming WebSocket connections
-io.on('connection', (socket) => {
-    console.log('User connected: ' + socket.id);
+let users = [];
 
-    // Receive message and send to all connected clients
-    socket.on('sendMessage', (message) => {
-        io.emit('receiveMessage', message);
+io.on("connection", (socket) => {
+    console.log("User connected: " + socket.id);
+
+    socket.on("joinChat", (username) => {
+        users.push({ id: socket.id, username });
+        io.emit("updateUserList", users);
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected: ' + socket.id);
+    socket.on("sendMessage", (message) => {
+        io.emit("receiveMessage", message);
+    });
+
+    socket.on("disconnect", () => {
+        users = users.filter(user => user.id !== socket.id);
+        io.emit("updateUserList", users);
     });
 });
 
-// Start the server
-server.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
+server.listen(3000, () => console.log("Server running on port 3000"));
